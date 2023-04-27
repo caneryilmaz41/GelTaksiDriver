@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:driver_taksi/authentication/login_screen.dart';
-import 'package:driver_taksi/authentication/signup_screen.dart';
+import 'package:driver_taksi/global/global.dart';
 import 'package:driver_taksi/main_screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +15,17 @@ class _MySplashScreenState extends State<MySplashScreen> {
 
     startTimer(){
       Timer(const Duration(seconds:3),()async{
-        Navigator.push(context, MaterialPageRoute(builder:(c)=>   (
+        if(await fAuth.currentUser!=null){
+          currenFirebaseUser=fAuth.currentUser;
+          Navigator.push(context, MaterialPageRoute(builder:(c)=>   (
+          MainScreen()
+        )));
+        }else{
+          Navigator.push(context, MaterialPageRoute(builder:(c)=>   (
           LoginScreen()
         )));
+        }
+        
       });
     }
     @override

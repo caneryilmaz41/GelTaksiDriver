@@ -1,7 +1,11 @@
+import 'package:driver_taksi/global/global.dart';
+import 'package:driver_taksi/splash_Screen/splash_screen.dart';
 import 'package:driver_taksi/utils/constants.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CarInfoScreen extends StatefulWidget {
   @override
@@ -14,6 +18,18 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
   TextEditingController carColorController = TextEditingController();
   List<String> carTypeList = ['Dacia', 'Megane', 'Honda'];
   String? selectedCarType;
+  saveCarInfo(){
+    Map driverCarInfoMap={
+          "car_color":carColorController.text.trim(),
+          "car_number":carNumberController.text.trim(),
+          "car_model":carModelController.text.trim(),
+          "type":selectedCarType
+        };
+         DatabaseReference driversRef= FirebaseDatabase.instance.ref().child("drivers");
+      driversRef.child(currenFirebaseUser!.uid).child("car_details").set(driverCarInfoMap);
+      Fluttertoast.showToast(msg: 'Araç bilgileri kaydedildi.');
+      Navigator.push(context, MaterialPageRoute(builder:(c)=>const MySplashScreen()));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +37,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0), 
             child: Column(
               children: [
                 Padding(
@@ -106,7 +122,12 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 ),
                 const SizedBox(height: 20,),
                 ElevatedButton(onPressed:(){
-                  Navigator.push(context, MaterialPageRoute(builder:(c)=>CarInfoScreen()));
+                 if(carColorController.text.isNotEmpty
+                 &&carNumberController.text.isNotEmpty
+                 &&carModelController.text.isNotEmpty
+                 &&selectedCarType!=null){
+                  saveCarInfo();
+                 }
                 }, 
                 style:ElevatedButton.styleFrom(
                   primary:mycolor 

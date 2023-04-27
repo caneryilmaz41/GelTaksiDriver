@@ -1,7 +1,12 @@
 import 'package:driver_taksi/authentication/car_info_screen.dart';
 import 'package:driver_taksi/authentication/login_screen.dart';
+import 'package:driver_taksi/global/global.dart';
 import 'package:driver_taksi/utils/constants.dart';
+import 'package:driver_taksi/widgets/progress_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -13,6 +18,57 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController emailTextEditingController=TextEditingController();
   TextEditingController phoneTextEditingController=TextEditingController();
   TextEditingController passwordTextEditingController=TextEditingController();
+  validateForm(){
+
+    if(nameTextEditingController.text.length<3){
+      Fluttertoast.showToast(msg: 'İsminiz en az 3 karakter içermelidir.');
+    }else if(!emailTextEditingController.text.contains('@')){
+      Fluttertoast.showToast(msg: 'Geçersiz email adresi');
+    }else if(phoneTextEditingController.text.isEmpty){
+      Fluttertoast.showToast(msg: 'Telefon numarası boş bırakılamaz.');
+    }else if(passwordTextEditingController.text.length<6){
+      Fluttertoast.showToast(msg: 'Parolanız en az 6 karakter içermelidir.');
+    }
+    else{
+      saveDriverInfoNow();
+    }
+  }
+  saveDriverInfoNow()async{
+    showDialog(
+        context:context,
+        barrierDismissible:false,
+        builder:(BuildContext c){
+          return ProgressDialog(message:'İşlem devam ediyor,Lütfen bekleyin',);
+        }
+      );
+      final User? firebaseUser=(
+        await fAuth.createUserWithEmailAndPassword(
+          email:emailTextEditingController.text.trim(),
+          password:passwordTextEditingController.text.trim()
+
+        ).catchError((msg){
+          Navigator.pop(context);
+          Fluttertoast.showToast(msg: 'Hata: '+msg.toString());
+        })
+      ).user;
+      if(firebaseUser!=null){
+        Map driverMap={
+          "id":firebaseUser.uid,
+          "name":nameTextEditingController.text.trim(),
+          "email":emailTextEditingController.text.trim(),
+          "phone":phoneTextEditingController.text.trim()
+        };
+      DatabaseReference driversRef= FirebaseDatabase.instance.ref().child("drivers");
+      driversRef.child(firebaseUser.uid).set(driverMap);
+      currenFirebaseUser=firebaseUser;
+      Fluttertoast.showToast(msg: 'Hesabınız başarılı bir şekilde oluşturuldu');
+      Navigator.push(context, MaterialPageRoute(builder:(c)=>CarInfoScreen()));
+      
+      }else{
+        Navigator.pop(context);
+        Fluttertoast.showToast(msg: 'Hesap oluşturulamadı.');
+      }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Image.asset('images/ferofen.png'),
+                  child: Image.asset('images/taxi-driver.png'),
                 ),
                 const SizedBox(
                   height: 10,
@@ -112,7 +168,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               const SizedBox(height: 20,),
                 ElevatedButton(onPressed:(){
-                  Navigator.push(context, MaterialPageRoute(builder:(c)=>CarInfoScreen()));
+                  validateForm();
+                  //Navigator.push(context, MaterialPageRoute(builder:(c)=>CarInfoScreen()));
                 }, 
                 style:ElevatedButton.styleFrom(
                   primary:mycolor 
