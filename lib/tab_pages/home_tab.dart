@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../assistans/assistants_methods.dart';
 
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({super.key});
@@ -13,13 +13,16 @@ class HomeTabPage extends StatefulWidget {
 }
 
 class _HomeTabPageState extends State<HomeTabPage> {
-  GoogleMapController ?newGoogleMapController;
+  GoogleMapController? newGoogleMapController;
   final Completer<GoogleMapController> _controllerGoogleMap =
       Completer<GoogleMapController>();
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
+  Position? userCurrentPosition;
+  var geoLocator = Geolocator();
+  LocationPermission?_locationPermission;
   blackThemeGoogleMap() {
     newGoogleMapController!.setMapStyle('''
                     [
@@ -185,20 +188,48 @@ class _HomeTabPageState extends State<HomeTabPage> {
                     ]
                 ''');
   }
+  checkIfPermissionAllowed() async {
+    _locationPermission = await Geolocator.requestPermission();
+    if (_locationPermission == LocationPermission.denied) {
+      _locationPermission = await Geolocator.requestPermission();
+    }
+  }
+  locateDriverPosition() async {
+    Position cPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    userCurrentPosition = cPosition;
+    LatLng latLngPosition =
+        LatLng(userCurrentPosition!.latitude, userCurrentPosition!.longitude);
+    CameraPosition cameraPosition =
+        CameraPosition(target: latLngPosition, zoom: 14);
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    String humanReadableAdress =
+        await AssistanMethods.searchAddressForGeoCoordinates(
+            userCurrentPosition!, context);
+    print('senin adres= ' + humanReadableAdress);
+   
+  }
+    @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkIfPermissionAllowed();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Stack(
+    return Stack(
       children: [
         GoogleMap(
-          initialCameraPosition:_kGooglePlex,
-          mapType:MapType.normal,
-          myLocationEnabled:true,
+          initialCameraPosition: _kGooglePlex,
+          mapType: MapType.normal,
+          myLocationEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             _controllerGoogleMap.complete(controller);
-            newGoogleMapController=controller;
+            newGoogleMapController = controller;
             blackThemeGoogleMap();
-
+            locateDriverPosition();
           },
         )
       ],
