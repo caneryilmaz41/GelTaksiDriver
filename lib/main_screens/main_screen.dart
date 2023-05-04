@@ -44,13 +44,13 @@ class _MainScreenState extends State<MainScreen>with SingleTickerProviderStateMi
       ),
       bottomNavigationBar:BottomNavigationBar(items: const [
         BottomNavigationBarItem(icon:Icon(Icons.home,),
-        label:'Home'),
+        label:'Anasayfa'),
         BottomNavigationBarItem(icon:Icon(Icons.credit_card,),
-        label:'Earning'),
+        label:'Ücret'),
         BottomNavigationBarItem(icon:Icon(Icons.star,),
-        label:'Ratings'),
+        label:'Puanla'),
         BottomNavigationBarItem(icon:Icon(Icons.person,),
-        label:'Profile ')
+        label:'Hesabım ')
       ],
       unselectedItemColor:Colors.amber,
       selectedItemColor:Colors.white,

@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../global/global.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -107,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextField(
                 obscureText: true,
-                style: TextStyle(color: Colors.grey),
+                style:const TextStyle(color: Colors.grey),
                 controller: passwordTextEditingController,
                 decoration: const InputDecoration(
                     labelText: 'Parola',
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (c) => SignUpScreen()));
                   },
-                  child: Text(
+                  child:const Text(
                     'Hesabım yok,Kayıt ol',
                     style: TextStyle(color: Colors.grey),
                   ))

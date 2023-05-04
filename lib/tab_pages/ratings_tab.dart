@@ -13,7 +13,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child:Text('Ratings'),
+      child:Text('Oy Ver'),
     );
   }
 }

@@ -13,7 +13,7 @@ class _EaringTabPageState extends State<EaringTabPage> {
   @override
   Widget build(BuildContext context) {
      return Center(
-      child:Text('Earning'),
+      child:Text('Ücret'),
     );
   }
 }
