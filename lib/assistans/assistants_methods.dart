@@ -22,13 +22,14 @@ class AssistanMethods{
      userPickUpAddress.locationLongitude=position.longitude;
      userPickUpAddress.locationName=humanReadableAdress;
      Provider.of<AppInfo>(context,listen:false).updatePickUpLocationAddress(userPickUpAddress);
-
+  
     }
     return humanReadableAdress;
   }
   static void readCurrentOnlineUserInfo()async{
     currenFirebaseUser=fAuth.currentUser; 
     DatabaseReference userRef=FirebaseDatabase.instance
+      
     .ref()
     .child("users")
     .child(currenFirebaseUser!.uid);
